@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cairn-core"
+version = "0.2.0"
+description = "The content-addressed state graph and deterministic replay protocol for AI agent executions"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+authors = [{ name = "Cairn Contributors" }]
+keywords = ["ai", "agents", "replay", "audit", "merkle", "content-addressed", "debugging"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: System :: Archiving",
+    "Typing :: Typed",
+]
+dependencies = []
+
+[project.optional-dependencies]
+fast = ["blake3>=0.3"]
+dev = ["pytest>=7"]
+
+[project.scripts]
+cairn = "cairn.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/Atomic-God/Cairn"
+Repository = "https://github.com/Atomic-God/Cairn"
+Issues = "https://github.com/Atomic-God/Cairn/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["cairn*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

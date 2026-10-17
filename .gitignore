@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+.venv/
+venv/
+
+# Test / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Cairn repos created during local dev / tests
+.cairn/
+.cairn/LOCK
+.cairn/objects/
+
+# Native extension build artifacts (built from rust/; never committed)
+*.so
+*.dylib
+*.dll
+*.pyd
+rust/target/
+
+# Release archives
+*.tar.gz
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*~

@@ -1,0 +1,23 @@
+[package]
+name = "cairn-native"
+version = "0.2.0"
+edition = "2021"
+description = "Optional native accelerator for cairn-core (BLAKE3 + Ed25519 via PyO3)"
+license = "MIT"
+repository = "https://github.com/Atomic-God/Cairn"
+homepage = "https://github.com/Atomic-God/Cairn"
+
+[lib]
+name = "_cairn_native"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { version = "0.23" }
+blake3 = "1"
+ed25519-dalek = "2"
+
+[features]
+# Enable when building the loadable extension module so it does not link
+# libpython (Python symbols are resolved from the importing interpreter).
+# `cargo test` builds *without* this feature and links libpython normally.
+extension-module = ["pyo3/extension-module"]
