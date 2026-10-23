@@ -20,7 +20,7 @@ from .session import AgentClient, Session
 from .store import Repo
 from .verify import verify
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 __all__ = [
     "AgentClient",
