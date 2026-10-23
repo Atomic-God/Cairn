@@ -69,7 +69,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/cairn-ai
+      url: https://pypi.org/p/cairn-vcs
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v4

@@ -3,7 +3,7 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "cairn-ai"
+name = "cairn-vcs"
 version = "0.2.1"
 description = "The content-addressed state graph and deterministic replay protocol for AI agent executions"
 readme = "README.md"

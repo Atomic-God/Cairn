@@ -39,7 +39,7 @@ jobs:
 
       - name: Clean install from wheel
         run: |
-          python -m pip uninstall -y cairn-ai
+          python -m pip uninstall -y cairn-vcs
           python -m pip install dist/*.whl
 
       - name: Test suite against wheel install

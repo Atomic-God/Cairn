@@ -7,7 +7,7 @@ Demonstrates:
    as signed nodes in the Cairn DAG.
 
 Usage:
-    pip install langchain langchain-openai cairn-ai
+    pip install langchain langchain-openai cairn-vcs
     export OPENAI_API_KEY="sk-..."
     python examples/langchain_agent.py
 """

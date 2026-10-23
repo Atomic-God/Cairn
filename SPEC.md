@@ -3,7 +3,7 @@
 Version 1.0 — 3 October 2026.
 
 This document defines the on-disk format, the canonical serialisation, the
-identity scheme, and the signing scheme of Cairn (`cairn-ai`), so that any
+identity scheme, and the signing scheme of Cairn (`cairn-vcs`), so that any
 independent implementation can read and verify a Cairn repository byte-for-byte.
 
 ## 1. Hash function
