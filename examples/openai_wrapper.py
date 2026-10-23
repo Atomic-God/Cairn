@@ -8,7 +8,7 @@ Demonstrates:
 3. Cryptographic audit: `cairn verify` verifies the trace mathematically.
 
 Usage:
-    pip install openai cairn-core
+    pip install openai cairn-ai
     export OPENAI_API_KEY="sk-..."
     python examples/openai_wrapper.py
 """

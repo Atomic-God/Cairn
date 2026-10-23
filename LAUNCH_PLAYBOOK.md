@@ -149,12 +149,12 @@ Submit a pull request to:
 
 ## 6. PyPI Publishing (2-Minute Setup)
 
-To allow anyone in the world to run `pip install cairn-core`:
+To allow anyone in the world to run `pip install cairn-ai`:
 
 1. Log into [pypi.org](https://pypi.org).
 2. Go to **Account Settings → Publishing**.
 3. Add a new **GitHub publisher**:
-   - **PyPI Project Name**: `cairn-core`
+   - **PyPI Project Name**: `cairn-ai`
    - **Owner**: `Atomic-God`
    - **Repository name**: `Cairn`
    - **Workflow name**: `publish.yml`

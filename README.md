@@ -1,7 +1,7 @@
 # Cairn — the Git of autonomous intelligence
 
 [![CI](https://github.com/Atomic-God/Cairn/actions/workflows/ci.yml/badge.svg)](https://github.com/Atomic-God/Cairn/actions/workflows/ci.yml)
-[![PyPI](https://img.shields.io/pypi/v/cairn-core?color=blue)](https://pypi.org/project/cairn-core/)
+[![PyPI](https://img.shields.io/pypi/v/cairn-ai?color=blue)](https://pypi.org/project/cairn-ai/)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Zero Dependencies](https://img.shields.io/badge/dependencies-zero-brightgreen.svg)](pyproject.toml)
@@ -55,7 +55,7 @@ in about a second.
 ## Quickstart
 
 ```bash
-pip install cairn-core
+pip install cairn-ai
 cd my-agent-project
 cairn init
 ```
@@ -367,7 +367,7 @@ recording and replay:
   Python inside this repo (validated against the official BLAKE3 vectors and
   the RFC 8032 vectors). Two optional accelerators exist, both
   byte-identical to the pure implementations: the `blake3` PyPI package
-  (`pip install cairn-core[fast]`) for hashing, and the PyO3 native engine
+  (`pip install cairn-ai[fast]`) for hashing, and the PyO3 native engine
   in `rust/` (BLAKE3 + Ed25519) for the full hot path. The pure backend is
   always the correctness reference.
 - **Native engine.** `rust/` builds `_cairn_native` via PyO3
@@ -392,7 +392,7 @@ recording and replay:
   runs in ~55µs (sign) and ~0.5µs (hash), well under 200µs; the remainder
   is durable I/O (`fsync`, atomic ref writes). The pure-Python fallback
   (~48ms/commit) remains the correctness reference and keeps
-  `pip install cairn-core` dependency-free. Blobs larger than
+  `pip install cairn-ai` dependency-free. Blobs larger than
   `CAIRN_MAX_BLOB_BYTES` (default 8 MiB) are rejected with a clear error
   instead of stalling the pure-Python hasher.
 - **Concurrency.** Commits to the same branch are linearizable: concurrent
@@ -404,7 +404,7 @@ recording and replay:
   (`CAIR` magic `43 41 49 52`, protocol version `01`), canonical JSON,
   node identity, signing, refs, and replay — everything an independent
   implementation needs to read and verify a Cairn repository.
-- **Install.** `pip install cairn-core`, or run `install.sh` for a
+- **Install.** `pip install cairn-ai`, or run `install.sh` for a
   user-local install (`~/.cairn/venv` + `~/.local/bin/cairn`). CI runs the
   full suite on Linux, macOS, and Windows across Python 3.10–3.13
   (`.github/workflows/ci.yml`).
