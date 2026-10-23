@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.2.1] - 2026-10-23
+
+### Added
+
+* **Native Framework Integrations (`cairn.integrations`)**:
+  - `wrap_openai`: 1-line wrapper for sync and async OpenAI clients (`client.chat.completions.create`), automatically recording prompts, model settings, seeds, token usage, and streaming responses to the Cairn DAG.
+  - `@wrap_tool`: Tool execution decorator and wrapper recording tool invocations and results.
+  - `CairnCallbackHandler`: Standard LangChain callback handler for `ChatModel`, `AgentExecutor`, and `LangGraph`.
+  - `wrap_anthropic`: 1-line wrapper for Anthropic Claude SDK (`client.messages.create`).
+  - `CairnCrewCallback`: Step and task callbacks for CrewAI multi-agent crews.
+  - Complete worked examples in `examples/openai_wrapper.py` and `examples/langchain_agent.py`.
+  - Full unit test suite in `tests/test_integrations.py`.
+
 ## [0.2.0] - 2026-10-17
 
 Hardening release: every gap found by the thousand-agent stress audit is

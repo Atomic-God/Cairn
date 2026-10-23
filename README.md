@@ -104,6 +104,67 @@ cairn replay <head> --agent myagent:run --branch repro
 # Node ids identical to recording: YES — deterministic replay proven
 ```
 
+## 1-Line Framework Integrations
+
+Cairn integrates directly with modern LLM SDKs and agent frameworks without adding mandatory dependencies.
+
+### OpenAI (Sync, Async & Streaming)
+
+```python
+from openai import OpenAI
+from cairn import Session
+from cairn.integrations.openai import wrap_openai, wrap_tool
+
+session = Session.create("./my-agent", actor="researcher")
+client = wrap_openai(OpenAI(), session=session)
+
+# Prompts, model parameters, seed, tool calls, and streaming responses are
+# automatically captured as immutable nodes in the Merkle DAG:
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[{"role": "user", "content": "Analyze quarterly filings"}],
+    seed=42,
+)
+
+@wrap_tool(session=session)
+def search_sec_filings(ticker: str):
+    return {"filing_date": "2026-10-01", "revenue": "$12.4B"}
+```
+
+### LangChain & LangGraph
+
+```python
+from langchain_openai import ChatOpenAI
+from langchain.agents import create_tool_calling_agent, AgentExecutor
+from cairn import Session
+from cairn.integrations.langchain import CairnCallbackHandler
+
+session = Session.create("./my-agent", actor="auditor")
+handler = CairnCallbackHandler(session)
+
+# Attach handler to any LangChain ChatModel, Chain, or AgentExecutor:
+llm = ChatOpenAI(model="gpt-4o", callbacks=[handler])
+executor = AgentExecutor(agent=agent, tools=tools, callbacks=[handler])
+result = executor.invoke({"input": "Verify ledger entries"})
+```
+
+### Anthropic Claude
+
+```python
+from anthropic import Anthropic
+from cairn import Session
+from cairn.integrations.anthropic import wrap_anthropic
+
+session = Session.create("./my-agent", actor="analyst")
+client = wrap_anthropic(Anthropic(), session=session)
+
+response = client.messages.create(
+    model="claude-3-5-sonnet-20241022",
+    max_tokens=1024,
+    messages=[{"role": "user", "content": "Extract KPIs"}],
+)
+```
+
 ## How it works
 
 ```
@@ -352,6 +413,7 @@ recording and replay:
 
 ```
 cairn/            # the package
+  integrations/   # 1-line adapters: OpenAI, LangChain, Anthropic, CrewAI
   _blake3_pure.py # pure-Python BLAKE3 (official-vector validated)
   _native.py      # optional native accelerator loader (zero-dep fallback)
   hash.py         # hash layer: native → fast → pure backends

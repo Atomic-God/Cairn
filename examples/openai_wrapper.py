@@ -1,56 +1,117 @@
-"""Sketch: wrapping a real OpenAI-style client with Cairn.
+"""Instrumenting OpenAI agents with Cairn in one line.
 
-Not runnable as-is (needs the `openai` package and an API key); it shows the
-intended one-line instrumentation pattern for production use.
+Demonstrates:
+1. `wrap_openai(client, session)`: Intercepts completions & streaming, records
+   prompt, response, model, seed, and token counts to the Merkle DAG.
+2. `@wrap_tool(session=...)`: Intercepts tool calls and tool results with
+   zero boilerplate.
+3. Cryptographic audit: `cairn verify` verifies the trace mathematically.
+
+Usage:
+    pip install openai cairn-core
+    export OPENAI_API_KEY="sk-..."
+    python examples/openai_wrapper.py
 """
 
-# pip install openai
-from openai import OpenAI  # noqa: F401
+from __future__ import annotations
+
+import json
+import os
+import sys
 
 from cairn import Session
+from cairn.integrations.openai import wrap_openai, wrap_tool
 
-# client = OpenAI()
-#
-# def llm(request, model=None, seed=None):
-#     """Adapter: Cairn request dict -> OpenAI call -> plain-dict response."""
-#     resp = client.chat.completions.create(
-#         model=model,
-#         messages=request["messages"],
-#         seed=seed,                       # recorded in the node!
-#         response_format={"type": "json_object"},
-#     )
-#     msg = resp.choices[0].message
-#     return {
-#         "content": msg.content,
-#         "tool_calls": [
-#             {"name": tc.function.name,
-#              "arguments": tc.function.arguments,
-#              "id": tc.id}
-#             for tc in (msg.tool_calls or [])
-#         ],
-#         "usage": {"prompt": resp.usage.prompt_tokens,
-#                   "completion": resp.usage.completion_tokens},
-#     }
-#
-#
-# def make_tools():
-#     # Map tool names to your real implementations.
-#     return {"get_weather": get_weather, "send_email": send_email}
-#
-#
-# with Session.create(".", actor="support-agent") as s:
-#     c = s.client(llm=llm, tools=make_tools())
-#     c.system("You are a support agent. Be concise.")
-#     c.user("Why is my invoice late?")
-#     while True:
-#         reply = c.infer({"messages": s.messages_as_openai()},  # see note
-#                         model="gpt-4o", seed=1234)
-#         calls = reply.get("tool_calls") or []
-#         if not calls:
-#             break
-#         for tc in calls:
-#             c.tool(tc["name"], json.loads(tc["arguments"]))
-#
-# NOTE: `Session.messages` gives you the Cairn context list; map it to
-# OpenAI's message format in your adapter. Keeping the adapter thin is what
-# keeps replay honest: the recorded `request` is exactly what was sent.
+try:
+    from openai import OpenAI
+except ImportError:
+    print("This example requires the `openai` package: pip install openai")
+    sys.exit(0)
+
+
+def run_agent():
+    api_key = os.environ.get("OPENAI_API_KEY")
+    if not api_key:
+        print("Note: Set OPENAI_API_KEY to run against real OpenAI API.")
+        print("Showing pattern structure below:")
+
+    # 1. Open or create a Cairn session
+    with Session.create("./agent-cairn-repo", actor="support-specialist") as s:
+
+        # 2. Wrap tools so every invocation is logged as a signed node
+        @wrap_tool(session=s, name="lookup_order")
+        def lookup_order(order_id: str) -> dict:
+            """Look up customer order status."""
+            return {
+                "order_id": order_id,
+                "status": "shipped",
+                "estimated_delivery": "Tomorrow by 5 PM",
+            }
+
+        # 3. One-line client instrumentation
+        client = wrap_openai(OpenAI(api_key=api_key or "sk-mock"), session=s)
+
+        tools_spec = [
+            {
+                "type": "function",
+                "function": {
+                    "name": "lookup_order",
+                    "description": "Look up order tracking and delivery status",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "order_id": {"type": "string"},
+                        },
+                        "required": ["order_id"],
+                    },
+                },
+            }
+        ]
+
+        messages = [
+            {"role": "system", "content": "You are a customer support agent. Be helpful and concise."},
+            {"role": "user", "content": "Where is my order ORD-9921?"},
+        ]
+
+        if not api_key:
+            # Simulated demonstration
+            s.system("You are a customer support agent. Be helpful and concise.")
+            s.user("Where is my order ORD-9921?")
+            lookup_order("ORD-9921")
+            print("Recorded sample run to ./agent-cairn-repo!")
+            print("Run `cairn log` to view the Merkle DAG.")
+            return
+
+        # Real OpenAI execution:
+        resp = client.chat.completions.create(
+            model="gpt-4o",
+            messages=messages,
+            tools=tools_spec,
+            seed=42,
+        )
+
+        msg = resp.choices[0].message
+        if msg.tool_calls:
+            for tc in msg.tool_calls:
+                fn_name = tc.function.name
+                args = json.loads(tc.function.arguments)
+                if fn_name == "lookup_order":
+                    tool_res = lookup_order(**args)
+                    messages.append(msg)
+                    messages.append({
+                        "role": "tool",
+                        "tool_call_id": tc.id,
+                        "content": json.dumps(tool_res),
+                    })
+
+            # Final answer
+            final_resp = client.chat.completions.create(
+                model="gpt-4o",
+                messages=messages,
+                seed=42,
+            )
+            print("Agent reply:", final_resp.choices[0].message.content)
+
+
+if __name__ == "__main__":
+    run_agent()
